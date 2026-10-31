@@ -1,0 +1,9 @@
+{
+  "name": "SMS 船廠工作管理",
+  "short_name": "SMS工作管理",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f9fa",
+  "theme_color": "#142b3b",
+  "description": "個人造船廠工作管理系統"
+}

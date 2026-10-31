@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#142b3b">
+<meta name="description" content="個人造船廠工作管理系統">
+<link rel="manifest" href="manifest.webmanifest">
+<title>SMS 船廠工作管理</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:#172b3a;background:#edf2f5;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;background:#edf2f5}.app{max-width:760px;margin:auto;min-height:100vh;background:#f7f9fa;padding-bottom:82px}
+header{background:#142b3b;color:white;padding:22px 18px 18px;position:sticky;top:0;z-index:5;box-shadow:0 3px 12px #142b3b22}
+.brand{font-size:12px;letter-spacing:2px;opacity:.72}.headrow{display:flex;justify-content:space-between;align-items:center}.headrow h1{font-size:21px;margin:5px 0 0}.version{font-size:11px;border:1px solid #ffffff55;border-radius:20px;padding:5px 9px}
+main{padding:16px}.page{display:none}.page.active{display:block}.section-title{font-size:18px;font-weight:800;margin:5px 0 12px}.muted{color:#6d7d88;font-size:12px}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat,.card{background:white;border:1px solid #e1e8ed;border-radius:15px;padding:14px;box-shadow:0 3px 12px #18364a08}.stat .num{font-size:27px;font-weight:800;margin:5px 0}.stat .label{font-size:12px;color:#71818b}.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.quick button{min-height:90px;text-align:left;background:white;color:#1c3545;border:1px solid #dce5eb;border-radius:14px;padding:14px;font-weight:750}.quick span{display:block;color:#74838d;font-size:12px;font-weight:400;margin-top:5px}
+nav{position:fixed;bottom:0;left:0;right:0;max-width:760px;margin:auto;background:#fff;border-top:1px solid #dce5eb;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 4px calc(7px + env(safe-area-inset-bottom));z-index:8}
+nav button{border:0;background:transparent;color:#71818b;font-size:11px;padding:6px 2px}nav button b{display:block;font-size:19px;margin-bottom:2px}nav button.active{color:#176b86;font-weight:800}
+form{display:grid;gap:11px}.field{display:grid;gap:5px}label{font-size:12px;font-weight:750;color:#455a68}input,select,textarea{width:100%;border:1px solid #d3dee5;border-radius:10px;padding:11px 12px;background:#fff;color:#172b3a;font:inherit;font-size:14px}textarea{min-height:76px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:0;border-radius:11px;background:#176b86;color:white;padding:12px 14px;font-weight:750;font-size:14px}.btn.secondary{background:#e5eef2;color:#214252}.btn.danger{background:#fff0ef;color:#a33b32}.btn.small{padding:7px 10px;font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap}.list{display:grid;gap:9px}.item{background:white;border:1px solid #e1e8ed;border-radius:13px;padding:12px}.itemtop{display:flex;justify-content:space-between;gap:10px}.pill{font-size:11px;border-radius:20px;padding:4px 8px;background:#e7f2f5;color:#17617a;white-space:nowrap}.empty{padding:22px;text-align:center;color:#82919a;background:#fff;border:1px dashed #cbd7de;border-radius:13px;font-size:13px}
+.notice{background:#fff7e6;border:1px solid #f0dfb8;color:#725522;padding:11px;border-radius:11px;font-size:12px;line-height:1.6;margin-bottom:12px}
+hr{border:0;border-top:1px solid #e7edf0;margin:13px 0}.subhead{font-weight:800;margin:16px 0 8px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;background:white;font-size:12px}th,td{padding:9px;border-bottom:1px solid #e8edf0;text-align:left;white-space:nowrap}th{background:#edf3f6}
+@media(min-width:600px){main{padding:22px}.cards{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="headrow"><div><div class="brand">SHIPYARD MANAGEMENT SYSTEM</div><h1>船廠工作管理</h1></div><div class="version">個人版 V1.0</div></div></header>
+<main>
+<section id="home" class="page active">
+ <div class="section-title">工作總覽</div><div class="muted" id="todayText"></div>
+ <div class="cards" style="margin-top:12px">
+  <div class="stat"><div>👷</div><div class="num" id="staffCount">0</div><div class="label">人員總數</div></div>
+  <div class="stat"><div>📋</div><div class="num" id="workCount">0</div><div class="label">工作紀錄</div></div>
+  <div class="stat"><div>⏱</div><div class="num" id="otTotal">0</div><div class="label">加班總時數</div></div>
+  <div class="stat"><div>⚠️</div><div class="num" id="openDefects">0</div><div class="label">待改善缺失</div></div>
+ </div>
+ <div class="subhead">快速新增</div><div class="quick">
+  <button onclick="showPage('attendance')">🗓️ 出勤與加班<span>逐人記錄每日狀態</span></button>
+  <button onclick="showPage('work')">📝 施工紀錄<span>工程、構件及工作進度</span></button>
+  <button onclick="showPage('staff')">👥 人員技能<span>焊工技能與評級</span></button>
+  <button onclick="showPage('quality')">📷 品質缺失<span>缺失、責任工序與改善</span></button>
+ </div>
+ <div class="subhead">資料管理</div><div class="card"><div class="muted">資料儲存在這台手機的瀏覽器本機資料庫。請定期匯出 JSON 備份；清除瀏覽器資料可能造成紀錄遺失。</div><div class="actions" style="margin-top:12px"><button class="btn secondary" onclick="exportBackup()">匯出完整備份</button><label class="btn secondary" style="display:inline-flex;align-items:center">匯入備份<input type="file" accept=".json,application/json" onchange="importBackup(event)" hidden></label></div></div>
+</section>
+
+<section id="attendance" class="page">
+ <div class="section-title">每日出勤與加班</div>
+ <div class="notice">出勤採「每天、每位員工」獨立紀錄。加班直接輸入總時數；休假日可將加班填 0。</div>
+ <form id="attendanceForm">
+  <div class="field"><label>日期</label><input type="date" id="attDate" required></div>
+  <div class="field"><label>員工</label><select id="attStaff" required></select></div>
+  <div class="field"><label>出勤狀態</label><select id="attStatus"><option>正常出勤</option><option>加班出勤</option><option>休假</option><option>例假</option><option>國定假日</option><option>事假</option><option>病假</option><option>其他</option></select></div>
+  <div class="field"><label>加班總時數（小時）</label><input type="number" id="attOT" min="0" max="24" step="0.5" value="0"></div>
+  <div class="field"><label>備註</label><input id="attNote" placeholder="例如：支援夜班、補休等"></div>
+  <button class="btn">儲存出勤紀錄</button>
+ </form>
+ <div class="subhead">出勤紀錄</div><div id="attendanceList" class="list"></div>
+</section>
+
+<section id="work" class="page">
+ <div class="section-title">工程與施工紀錄</div>
+ <div class="notice">資料關係：一個工程可以建立多個構件；每筆施工紀錄可連結一個工程及其構件。</div>
+ <div class="card">
+  <div class="subhead" style="margin-top:0">建立工程</div>
+  <form id="projectForm"><div class="field"><label>工程名稱／編號</label><input id="projectName" required placeholder="例如：船段工程 P-001"></div><div class="field"><label>備註</label><input id="projectNote" placeholder="船名、區域或其他說明"></div><button class="btn secondary">新增工程</button></form>
+ </div>
+ <div class="card" style="margin-top:10px">
+  <div class="subhead" style="margin-top:0">新增構件</div>
+  <form id="componentForm"><div class="field"><label>所屬工程</label><select id="componentProject" required></select></div><div class="field"><label>構件編號</label><input id="componentName" required placeholder="例如：BC1"></div><div class="field"><label>構件備註</label><input id="componentNote"></div><button class="btn secondary">新增構件</button></form>
+ </div>
+ <div class="subhead">新增施工紀錄</div>
+ <form id="workForm" class="card">
+  <div class="field"><label>日期</label><input type="date" id="workDate" required></div>
+  <div class="field"><label>工程</label><select id="workProject" required></select></div>
+  <div class="field"><label>構件</label><select id="workComponent" required></select></div>
+  <div class="field"><label>施工人員（可複選）</label><div id="workerChecks" class="list"></div></div>
+  <div class="field"><label>施工項目</label><select id="workType"><option>CO₂焊接</option><option>手工焊接</option><option>組立</option><option>修整及補焊</option><option>品質檢查</option><option>其他</option></select></div>
+  <div class="field"><label>進度</label><select id="workProgress"><option>尚未開始</option><option selected>施工中</option><option>已完成</option></select></div>
+  <div class="field"><label>完成數量／焊接米數（選填）</label><input type="number" min="0" step="0.1" id="workQty" placeholder="數值"></div>
+  <div class="field"><label>單位</label><select id="workUnit"><option>米</option><option>件</option><option>道</option><option>其他</option></select></div>
+  <div class="field"><label>工作內容／備註</label><textarea id="workNote" placeholder="記錄施工狀況、問題或交接事項"></textarea></div>
+  <button class="btn">儲存施工紀錄</button>
+ </form>
+ <div class="subhead">工程與構件清單</div><div id="projectList" class="list"></div>
+ <div class="subhead">施工紀錄</div><div id="workList" class="list"></div>
+</section>
+
+<section id="staff" class="page">
+ <div class="section-title">人員與技能管理</div>
+ <form id="staffForm" class="card"><div class="field"><label>員工姓名／代號</label><input id="staffName" required placeholder="例如：努哈"></div><div class="field"><label>備註</label><input id="staffNote" placeholder="職務或其他說明"></div><button class="btn">新增人員</button></form>
+ <div class="subhead">技能評級</div><div class="muted">評級：未評、需加強、入門、熟練、合格的焊工。</div>
+ <div id="staffList" class="list" style="margin-top:10px"></div>
+</section>
+
+<section id="quality" class="page">
+ <div class="section-title">品質缺失管理</div>
+ <form id="defectForm" class="card">
+  <div class="field"><label>日期</label><input type="date" id="defDate" required></div>
+  <div class="field"><label>工程／構件</label><select id="defComponent"></select></div>
+  <div class="field"><label>缺失類型</label><select id="defType"><option>組立間隙過大／過小</option><option>錯位／切口不平整</option><option>氧化皮未清除</option><option>漏焊／熔深不足</option><option>焊道交會處缺失</option><option>補焊及修整不良</option><option>其他</option></select></div>
+  <div class="field"><label>責任工序</label><select id="defStage"><option>組立</option><option>焊接</option><option>修整</option><option>檢查</option><option>待確認</option></select></div>
+  <div class="field"><label>改善人員／責任人</label><select id="defOwner"></select></div>
+  <div class="field"><label>缺失說明</label><textarea id="defNote"></textarea></div>
+  <div class="field"><label>改善狀態</label><select id="defStatus"><option>待改善</option><option>改善中</option><option>待複驗</option><option>已結案</option></select></div>
+  <button class="btn">新增缺失紀錄</button>
+ </form>
+ <div class="subhead">缺失追蹤清單</div><div id="defectList" class="list"></div>
+</section>
+
+<section id="reports" class="page">
+ <div class="section-title">統計報表</div>
+ <div class="row"><div class="field"><label>統計起日</label><input type="date" id="reportFrom"></div><div class="field"><label>統計迄日</label><input type="date" id="reportTo"></div></div>
+ <button class="btn" style="width:100%;margin:10px 0" onclick="renderReports()">更新統計</button>
+ <div id="reportSummary" class="cards"></div>
+ <div class="subhead">員工加班時數</div><div id="otReport" class="tablewrap"></div>
+ <div class="subhead">出勤狀態統計</div><div id="attReport" class="tablewrap"></div>
+ <div class="subhead">工程工作紀錄</div><div id="projectReport" class="tablewrap"></div>
+ <button class="btn secondary" style="width:100%;margin-top:14px" onclick="exportCSV()">匯出報表 CSV</button>
+</section>
+</main>
+<nav>
+ <button class="active" data-page="home" onclick="showPage('home')"><b>⌂</b>首頁</button>
+ <button data-page="attendance" onclick="showPage('attendance')"><b>◷</b>出勤</button>
+ <button data-page="work" onclick="showPage('work')"><b>▤</b>工程</button>
+ <button data-page="staff" onclick="showPage('staff')"><b>♙</b>人員</button>
+ <button data-page="reports" onclick="showPage('reports')"><b>▥</b>報表</button>
+</nav>
+</div>
+<script>
+const DB_NAME='shipyard_sms_v1', DB_VERSION=1;
+const STORES=['staff','attendance','projects','components','worklogs','defects'];
+let db;
+const today=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{const d=req.result;for(const s of STORES){if(!d.objectStoreNames.contains(s))d.createObjectStore(s,{keyPath:'id'});} };req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
+function all(store){return new Promise((res,rej)=>{const r=db.transaction(store).objectStore(store).getAll();r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+function put(store,obj){return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');tx.objectStore(store).put(obj);tx.oncomplete=()=>res(obj);tx.onerror=()=>rej(tx.error);});}
+function del(store,id){return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');tx.objectStore(store).delete(id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function showPage(p){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===p));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===p));if(p==='reports')renderReports();await refresh();}
+async function refresh(){await Promise.all([renderHome(),renderAttendance(),renderProjects(),renderStaff(),renderWork(),renderDefects(),fillSelects()]);}
+async function renderHome(){const [s,w,a,d]=await Promise.all([all('staff'),all('worklogs'),all('attendance'),all('defects')]);document.getElementById('todayText').textContent='今天是 '+today();document.getElementById('staffCount').textContent=s.length;document.getElementById('workCount').textContent=w.length;document.getElementById('otTotal').textContent=a.filter(x=>x.date===today()).reduce((n,x)=>n+Number(x.overtime||0),0).toFixed(1);document.getElementById('openDefects').textContent=d.filter(x=>x.status!=='已結案').length;}
+async function fillSelects(){const [s,p,c]=await Promise.all([all('staff'),all('projects'),all('components')]);const opt=(v,t)=>`<option value="${esc(v)}">${esc(t)}</option>`;document.getElementById('attStaff').innerHTML=s.map(x=>opt(x.id,x.name)).join('')||'<option value="">請先新增人員</option>';document.getElementById('componentProject').innerHTML=p.map(x=>opt(x.id,x.name)).join('')||'<option value="">請先新增工程</option>';document.getElementById('workProject').innerHTML=p.map(x=>opt(x.id,x.name)).join('')||'<option value="">請先新增工程</option>';document.getElementById('defOwner').innerHTML='<option value="">未指定</option>'+s.map(x=>opt(x.id,x.name)).join('');document.getElementById('workerChecks').innerHTML=s.map(x=>`<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" value="${esc(x.id)}" style="width:auto"> ${esc(x.name)}</label>`).join('')||'<div class="muted">請先新增人員</div>';const compOpts=(projectId)=>c.filter(x=>x.projectId===projectId);const updateComp=(sel,proj)=>{const id=document.getElementById(proj).value;document.getElementById(sel).innerHTML=compOpts(id).map(x=>opt(x.id,x.name)).join('')||'<option value="">請先為此工程新增構件</option>';};updateComp('workComponent','workProject');updateComp('defComponent','workProject');document.getElementById('workProject').onchange=()=>updateComp('workComponent','workProject');document.getElementById('componentProject').onchange=()=>{};}
+async function renderAttendance(){const [a,s]=await Promise.all([all('attendance'),all('staff')]);const names=Object.fromEntries(s.map(x=>[x.id,x.name]));const el=document.getElementById('attendanceList');el.innerHTML=a.sort((x,y)=>y.date.localeCompare(x.date)).map(x=>`<div class="item"><div class="itemtop"><b>${esc(x.date)} · ${esc(names[x.staffId]||'已刪除人員')}</b><span class="pill">${esc(x.status)}</span></div><div class="muted" style="margin-top:6px">加班 ${Number(x.overtime||0)} 小時 ${x.note?'· '+esc(x.note):''}</div><div class="actions" style="margin-top:8px"><button class="btn danger small" onclick="removeRecord('attendance','${x.id}')">刪除</button></div></div>`).join('')||'<div class="empty">尚無出勤紀錄</div>';}
+async function renderProjects(){const [p,c]=await Promise.all([all('projects'),all('components')]);document.getElementById('projectList').innerHTML=p.map(x=>`<div class="item"><b>${esc(x.name)}</b><div class="muted">${c.filter(y=>y.projectId===x.id).length} 個構件 · ${esc(x.note||'')}</div><div class="actions" style="margin-top:8px"><button class="btn danger small" onclick="removeRecord('projects','${x.id}')">刪除工程</button></div></div>`).join('')||'<div class="empty">尚未建立工程</div>'; }
+async function renderStaff(){const s=await all('staff');const skills=['CO₂立焊','CO₂平焊','CO₂仰焊','手工點焊','手工連續焊'];document.getElementById('staffList').innerHTML=s.map(x=>`<div class="item"><div class="itemtop"><b>${esc(x.name)}</b><button class="btn danger small" onclick="removeRecord('staff','${x.id}')">刪除</button></div><div class="muted">${esc(x.note||'')}</div>${skills.map(k=>`<div class="row" style="align-items:center;margin-top:8px"><label>${k}</label><select onchange="setSkill('${x.id}','${k}',this.value)">${['未評','需加強','入門','熟練','合格的焊工'].map(v=>`<option ${((x.skills||{})[k]||'未評')===v?'selected':''}>${v}</option>`).join('')}</select></div>`).join('')}</div>`).join('')||'<div class="empty">尚未新增人員</div>';}
+async function setSkill(id,k,v){const s=await all('staff'),x=s.find(y=>y.id===id);x.skills=x.skills||{};x.skills[k]=v;await put('staff',x);}
+async function renderWork(){const [w,p,c,s]=await Promise.all([all('worklogs'),all('projects'),all('components'),all('staff')]);const pn=Object.fromEntries(p.map(x=>[x.id,x.name])),cn=Object.fromEntries(c.map(x=>[x.id,x.name])),sn=Object.fromEntries(s.map(x=>[x.id,x.name]));document.getElementById('workList').innerHTML=w.sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<div class="item"><div class="itemtop"><b>${esc(x.date)} · ${esc(pn[x.projectId]||'工程已刪除')}</b><span class="pill">${esc(x.progress)}</span></div><div style="margin-top:5px">${esc(cn[x.componentId]||'構件已刪除')} · ${esc(x.type)}</div><div class="muted">${(x.workerIds||[]).map(id=>esc(sn[id]||'')).join('、')} · ${x.quantity?esc(x.quantity)+' '+esc(x.unit):'未填數量'}</div><div class="muted">${esc(x.note||'')}</div><button class="btn danger small" style="margin-top:8px" onclick="removeRecord('worklogs','${x.id}')">刪除</button></div>`).join('')||'<div class="empty">尚無施工紀錄</div>';}
+async function renderDefects(){const [d,p,c,s]=await Promise.all([all('defects'),all('projects'),all('components'),all('staff')]);const pn=Object.fromEntries(p.map(x=>[x.id,x.name])),cn=Object.fromEntries(c.map(x=>[x.id,x.name])),sn=Object.fromEntries(s.map(x=>[x.id,x.name]));document.getElementById('defectList').innerHTML=d.sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<div class="item"><div class="itemtop"><b>${esc(x.type)}</b><span class="pill">${esc(x.status)}</span></div><div class="muted">${esc(x.date)} · ${esc(pn[x.projectId]||'未指定工程')} / ${esc(cn[x.componentId]||'未指定構件')}</div><div style="margin-top:5px">${esc(x.stage)} · ${esc(sn[x.ownerId]||'未指定責任人')}</div><div class="muted">${esc(x.note||'')}</div><div class="actions" style="margin-top:8px"><select onchange="changeDefectStatus('${x.id}',this.value)">${['待改善','改善中','待複驗','已結案'].map(v=>`<option ${x.status===v?'selected':''}>${v}</option>`).join('')}</select><button class="btn danger small" onclick="removeRecord('defects','${x.id}')">刪除</button></div></div>`).join('')||'<div class="empty">尚無缺失紀錄</div>';}
+async function changeDefectStatus(id,status){const d=await all('defects'),x=d.find(y=>y.id===id);x.status=status;await put('defects',x);refresh();}
+async function removeRecord(store,id){if(!confirm('確定刪除此筆資料？'))return;await del(store,id);await refresh();}
+document.getElementById('attendanceForm').onsubmit=async e=>{e.preventDefault();const x={id:uid(),date:attDate.value,staffId:attStaff.value,status:attStatus.value,overtime:Number(attOT.value||0),note:attNote.value};if(!x.staffId)return alert('請先新增員工');await put('attendance',x);attNote.value='';attOT.value='0';refresh();alert('出勤紀錄已儲存');};
+document.getElementById('projectForm').onsubmit=async e=>{e.preventDefault();await put('projects',{id:uid(),name:projectName.value.trim(),note:projectNote.value});e.target.reset();refresh();};
+document.getElementById('componentForm').onsubmit=async e=>{e.preventDefault();if(!componentProject.value)return alert('請先建立工程');await put('components',{id:uid(),projectId:componentProject.value,name:componentName.value.trim(),note:componentNote.value});e.target.reset();refresh();};
+document.getElementById('workForm').onsubmit=async e=>{e.preventDefault();const workers=[...workerChecks.querySelectorAll('input:checked')].map(x=>x.value);if(!workProject.value||!workComponent.value)return alert('請先建立工程及構件');await put('worklogs',{id:uid(),date:workDate.value,projectId:workProject.value,componentId:workComponent.value,workerIds:workers,type:workType.value,progress:workProgress.value,quantity:Number(workQty.value||0),unit:workUnit.value,note:workNote.value});workNote.value='';workQty.value='';refresh();alert('施工紀錄已儲存');};
+document.getElementById('staffForm').onsubmit=async e=>{e.preventDefault();await put('staff',{id:uid(),name:staffName.value.trim(),note:staffNote.value,skills:{}});e.target.reset();refresh();};
+document.getElementById('defectForm').onsubmit=async e=>{e.preventDefault();const c=await all('components');const comp=c.find(x=>x.id===defComponent.value);await put('defects',{id:uid(),date:defDate.value,projectId:comp?.projectId||'',componentId:defComponent.value,type:defType.value,stage:defStage.value,ownerId:defOwner.value,note:defNote.value,status:defStatus.value});defNote.value='';refresh();alert('缺失紀錄已儲存');};
+function setDefaults(){['attDate','workDate','defDate'].forEach(id=>document.getElementById(id).value=today());reportTo.value=today();const d=new Date();d.setDate(1);reportFrom.value=d.toISOString().slice(0,10);}
+async function renderReports(){const from=reportFrom.value||'0000-00-00',to=reportTo.value||'9999-99-99';const [s,a,w,p,c]=await Promise.all([all('staff'),all('attendance'),all('worklogs'),all('projects'),all('components')]);const aa=a.filter(x=>x.date>=from&&x.date<=to),ww=w.filter(x=>x.date>=from&&x.date<=to);const ot=aa.reduce((n,x)=>n+Number(x.overtime||0),0),days=aa.filter(x=>['正常出勤','加班出勤'].includes(x.status)).length,leave=aa.filter(x=>!['正常出勤','加班出勤'].includes(x.status)).length;reportSummary.innerHTML=[['加班總時數',ot.toFixed(1)+' 小時'],['出勤筆數',days],['休假／假日筆數',leave],['施工紀錄',ww.length]].map(x=>`<div class="stat"><div class="num">${x[1]}</div><div class="label">${x[0]}</div></div>`).join('');const rows=s.map(x=>[x.name,aa.filter(y=>y.staffId===x.id).reduce((n,y)=>n+Number(y.overtime||0),0).toFixed(1),aa.filter(y=>y.staffId===x.id&&['正常出勤','加班出勤'].includes(y.status)).length,aa.filter(y=>y.staffId===x.id&&!['正常出勤','加班出勤'].includes(y.status)).length]);otReport.innerHTML=table(['員工','加班時數','出勤筆數','休假／假日'],rows);const statuses=[...new Set(aa.map(x=>x.status))].map(st=>[st,aa.filter(x=>x.status===st).length]);attReport.innerHTML=table(['出勤狀態','筆數'],statuses);const pn=Object.fromEntries(p.map(x=>[x.id,x.name]));const prows=p.map(x=>[x.name,c.filter(y=>y.projectId===x.id).length,ww.filter(y=>y.projectId===x.id).length,ww.filter(y=>y.projectId===x.id&&y.progress==='已完成').length]);projectReport.innerHTML=table(['工程','構件數','施工紀錄','完成紀錄'],prows);}
+function table(h,r){return '<table><thead><tr>'+h.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+(r.length?r.map(row=>'<tr>'+row.map(x=>'<td>'+esc(x)+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+h.length+'">沒有資料</td></tr>')+'</tbody></table>';}
+async function exportBackup(){const data={format:'SMS_BACKUP_V1',exportedAt:new Date().toISOString()};for(const s of STORES)data[s]=await all(s);download('sms-backup-'+today()+'.json',JSON.stringify(data,null,2),'application/json');}
+function download(name,content,type){const a=document.createElement('a');const u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
+async function importBackup(e){const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(data.format!=='SMS_BACKUP_V1')throw Error('備份格式不正確');if(!confirm('匯入會以備份資料取代目前所有資料，確定繼續？'))return;for(const s of STORES){const tx=db.transaction(s,'readwrite');tx.objectStore(s).clear();for(const x of (data[s]||[]))tx.objectStore(s).put(x);await new Promise((r,j)=>{tx.oncomplete=r;tx.onerror=()=>j(tx.error);});}await refresh();alert('備份匯入完成');}catch(err){alert('匯入失敗：'+err.message);}e.target.value='';}
+async function exportCSV(){const [s,a,w,p]=await Promise.all([all('staff'),all('attendance'),all('worklogs'),all('projects')]);const name=Object.fromEntries(s.map(x=>[x.id,x.name]));const lines=[['類型','日期','人員','工程','狀態／項目','加班時數','備註'],...a.map(x=>['出勤',x.date,name[x.staffId]||'', '',x.status,x.overtime,x.note||'']),...w.map(x=>['施工',x.date,(x.workerIds||[]).map(id=>name[id]||'').join('、'),(p.find(y=>y.id===x.projectId)||{}).name||'',x.type+' / '+x.progress,'',x.note||''])];const csv='\ufeff'+lines.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');download('sms-report-'+today()+'.csv',csv,'text/csv;charset=utf-8');}
+(async()=>{try{db=await openDB();setDefaults();await refresh();if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./service-worker.js').catch(()=>{});}catch(e){alert('資料庫啟動失敗：'+e.message);}})();
+</script>
+</body></html>
