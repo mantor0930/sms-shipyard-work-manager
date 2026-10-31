@@ -6,7 +6,9 @@ CREATE TABLE staff (
 );
 CREATE TABLE attendance (
   id TEXT PRIMARY KEY, work_date TEXT NOT NULL, staff_id TEXT NOT NULL REFERENCES staff(id),
-  status TEXT NOT NULL, overtime_hours REAL NOT NULL DEFAULT 0 CHECK(overtime_hours >= 0 AND overtime_hours <= 24),
+  status TEXT NOT NULL, attendance_hours REAL NOT NULL DEFAULT 0 CHECK(attendance_hours >= 0 AND attendance_hours <= 24),
+  overtime_hours REAL NOT NULL DEFAULT 0 CHECK(overtime_hours >= 0 AND overtime_hours <= 24),
+  leave_type TEXT NOT NULL DEFAULT '無', leave_hours REAL NOT NULL DEFAULT 0 CHECK(leave_hours >= 0 AND leave_hours <= 24),
   note TEXT, UNIQUE(work_date, staff_id)
 );
 CREATE TABLE projects (
@@ -35,3 +37,29 @@ CREATE INDEX idx_attendance_staff_date ON attendance(staff_id, work_date);
 CREATE INDEX idx_components_project ON components(project_id);
 CREATE INDEX idx_worklogs_project_date ON worklogs(project_id, work_date);
 CREATE INDEX idx_defects_status_date ON defects(status, defect_date);
+
+
+-- 焊接設備、焊機位置與焊槍／遙控器領用紀錄
+CREATE TABLE equipment (
+  id TEXT PRIMARY KEY,
+  type TEXT NOT NULL CHECK (type IN ('焊機','焊槍','遙控器')),
+  code TEXT NOT NULL UNIQUE,
+  model TEXT,
+  location TEXT,
+  machine_id TEXT REFERENCES equipment(id),
+  status TEXT NOT NULL DEFAULT '可用',
+  assigned_staff_id TEXT REFERENCES staff(id),
+  note TEXT
+);
+
+CREATE TABLE equipment_logs (
+  id TEXT PRIMARY KEY,
+  date DATE NOT NULL,
+  asset_id TEXT NOT NULL REFERENCES equipment(id),
+  action TEXT NOT NULL,
+  staff_id TEXT REFERENCES staff(id),
+  previous_staff_id TEXT REFERENCES staff(id),
+  old_location TEXT,
+  new_location TEXT,
+  note TEXT
+);
